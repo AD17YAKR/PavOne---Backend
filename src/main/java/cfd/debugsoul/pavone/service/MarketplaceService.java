@@ -36,7 +36,7 @@ public class MarketplaceService {
             throw new RuntimeException("Only credit owner can create listing");
         }
         
-        if (credit.getRetired()) {
+        if (credit.getRetired() != null && credit.getRetired()) {
             throw new RuntimeException("Cannot list retired credits");
         }
         
