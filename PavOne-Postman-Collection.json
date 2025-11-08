@@ -1,0 +1,391 @@
+{
+	"info": {
+		"_postman_id": "pavone-carbon-credit-api",
+		"name": "PavOne - Carbon Credit Marketplace",
+		"description": "Complete API collection for PavOne hackathon demo",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:8080/api/v1",
+			"type": "string"
+		},
+		{
+			"key": "wallet",
+			"value": "0xabc123def456",
+			"type": "string"
+		},
+		{
+			"key": "treeId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "photoId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "reportId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "creditId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "listingId",
+			"value": "",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "1. Authentication",
+			"item": [
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const response = pm.response.json();",
+									"    pm.collectionVariables.set('token', response.token);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"wallet\": \"{{wallet}}\",\n    \"signature\": \"mock_signature\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/login",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "login"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "2. Trees",
+			"item": [
+				{
+					"name": "Create Tree",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const response = pm.response.json();",
+									"    pm.collectionVariables.set('treeId', response.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"ownerWallet\": \"{{wallet}}\",\n    \"species\": \"Moringa\",\n    \"plantedDate\": \"2025-01-01\",\n    \"lat\": 26.9124,\n    \"lon\": 75.7873,\n    \"initialHeightMm\": 1200,\n    \"initialDbhMm\": 30,\n    \"metadata\": {\n        \"notes\": \"Demo tree for hackathon\",\n        \"location\": \"Test Farm\"\n    }\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/trees",
+							"host": ["{{baseUrl}}"],
+							"path": ["trees"]
+						}
+					}
+				},
+				{
+					"name": "Get Tree",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/trees/{{treeId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["trees", "{{treeId}}"]
+						}
+					}
+				},
+				{
+					"name": "Upload Photo",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const response = pm.response.json();",
+									"    pm.collectionVariables.set('photoId', response.photoId);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "X-Demo-Wallet",
+								"value": "{{wallet}}"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": []
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/trees/{{treeId}}/photos",
+							"host": ["{{baseUrl}}"],
+							"path": ["trees", "{{treeId}}", "photos"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "3. Verification",
+			"item": [
+				{
+					"name": "Trigger Verification",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const response = pm.response.json();",
+									"    pm.collectionVariables.set('reportId', response.reportId);",
+									"    pm.collectionVariables.set('suggestedGrams', response.suggestedGrams);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"treeId\": \"{{treeId}}\",\n    \"photoId\": \"{{photoId}}\",\n    \"requestedBy\": \"{{wallet}}\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/verify",
+							"host": ["{{baseUrl}}"],
+							"path": ["verify"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "4. Credits",
+			"item": [
+				{
+					"name": "Mint Credits",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const response = pm.response.json();",
+									"    pm.collectionVariables.set('creditId', response.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"treeId\": \"{{treeId}}\",\n    \"ownerWallet\": \"{{wallet}}\",\n    \"grams\": 1250,\n    \"reportId\": \"{{reportId}}\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/credits/mint",
+							"host": ["{{baseUrl}}"],
+							"path": ["credits", "mint"]
+						}
+					}
+				},
+				{
+					"name": "Get Balance",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/credits/balance/{{wallet}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["credits", "balance", "{{wallet}}"]
+						}
+					}
+				},
+				{
+					"name": "Get Credits by Owner",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/credits/owner/{{wallet}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["credits", "owner", "{{wallet}}"]
+						}
+					}
+				},
+				{
+					"name": "Retire Credit",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"retiredBy\": \"{{wallet}}\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/credits/{{creditId}}/retire",
+							"host": ["{{baseUrl}}"],
+							"path": ["credits", "{{creditId}}", "retire"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "5. Marketplace",
+			"item": [
+				{
+					"name": "Create Listing",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const response = pm.response.json();",
+									"    pm.collectionVariables.set('listingId', response.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"creditId\": \"{{creditId}}\",\n    \"sellerWallet\": \"{{wallet}}\",\n    \"price\": 10.0,\n    \"currency\": \"USDC\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/listings",
+							"host": ["{{baseUrl}}"],
+							"path": ["listings"]
+						}
+					}
+				},
+				{
+					"name": "Get Active Listings",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/listings",
+							"host": ["{{baseUrl}}"],
+							"path": ["listings"]
+						}
+					}
+				},
+				{
+					"name": "Get Listings by Seller",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/listings/seller/{{wallet}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["listings", "seller", "{{wallet}}"]
+						}
+					}
+				},
+				{
+					"name": "Buy Listing",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"buyerWallet\": \"0xbuyer123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/listings/{{listingId}}/buy",
+							"host": ["{{baseUrl}}"],
+							"path": ["listings", "{{listingId}}", "buy"]
+						}
+					}
+				}
+			]
+		}
+	]
+}
